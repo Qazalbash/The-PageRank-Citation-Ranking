@@ -1,7 +1,5 @@
 import numpy as np
 
-# from graph import Graph
-
 # original paper
 # http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf
 
@@ -18,10 +16,11 @@ class Markov_Chain:
     """
 
     def __init__(self: "Markov_Chain", web_net: dict = None) -> None:
-        """Constructor
+        """_summary_
 
         Args:
-            web_net (dict, optional): Initial or pre-defined web-network. Defaults to None.
+            self (Markov_Chain): mandatory self object.
+            web_net (dict, optional): initial or pre-defined web-network. Defaults to None.
         """
         if web_net:
             self.web_net = web_net
@@ -29,6 +28,12 @@ class Markov_Chain:
             self.web_net = {}
 
     def transition_matrix(self: "Markov_Chain") -> None:
+        """Generate the transition matrix with the uniform probability
+        to each outwards edge a node has.
+
+        Args:
+            self (Markov_Chain): _description_
+        """
         self.P = np.zeros(
             shape=(
                 len(self.web_net),
@@ -42,6 +47,11 @@ class Markov_Chain:
                 self.P[_from][_to] = p
 
     def rank_vector(self: "Markov_Chain") -> None:
+        """rank vector that contains the rank as the web-pages
+
+        Args:
+            self (Markov_Chain): mandatory self object.
+        """
         size = len(self.web_net)
         uniform_probability = 1 / size
         self.rank = np.array([uniform_probability for _ in range(size)], dtype=float)
@@ -50,18 +60,29 @@ class Markov_Chain:
         self: "Markov_Chain",
         threshold: float = 0.001,
         max: int = 100,
+        **kwargs,
     ) -> None:
+        """starts the simulation by performing repetative matrix product following the
+        relation rank_vector_{n+1} = rank_vector_{n}*Transition_probablity_matrix
+
+        Args:
+            self (Markov_Chain): mandatory self object.
+            threshold (float, optional): minimum threshold to error. Defaults to 0.001.
+            max (int, optional): maximum number of itterations. Defaults to 100.
+        """
         self.transition_matrix()
         self.rank_vector()
-        print(self.rank)
+        if kwargs["show_change"]:
+            print("Ranking at the start of simulation:", self.rank)
         dist = 1
         while dist > threshold and max:
             old = self.rank
             self.rank = np.matmul(self.rank, self.P)
             dist = np.linalg.norm(old - self.rank)
             max -= 1
-        print(max)
-        print(self.rank)
+        if kwargs["show_change"]:
+            print("Ranking at the end of simulation:", self.rank)
+            print("It took", max, "steps to complete.")
 
     def add_state(self: "Markov_Chain", _from: int, _to: int) -> None:
         """add state to the graph state
@@ -96,4 +117,4 @@ web_network = {
 
 www = Markov_Chain(web_network)
 
-www.simulate()
+www.simulate(show_change=True)
