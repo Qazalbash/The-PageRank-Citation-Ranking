@@ -1,22 +1,13 @@
+from typing import Optional
+
 import numpy as np
-
-# original paper
-# http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf
-
-# video explaination
-# https://www.youtube.com/watch?v=JGQe4kiPnrU
 
 
 class Markov_Chain:
-    """Class to model markov state in python.
-
-    State tranistion incomplete.
-    error threshold <= 0.001
-    pi_{n+1} = (P^T) * pi_{n}, where P is the transition probability matrix.
-    """
+    """Class to model markov chain in python."""
 
     def __init__(self: "Markov_Chain", web_net: dict = None) -> None:
-        """_summary_
+        """Costructor
 
         Args:
             self (Markov_Chain): mandatory self object.
@@ -26,6 +17,12 @@ class Markov_Chain:
             self.web_net = web_net
         else:
             self.web_net = {}
+
+        self.threshold = 0.001
+        self.max = 100
+        self.alpha = 0.15
+        self.random_restart = True
+        self.show_change = False
 
     def transition_matrix(self: "Markov_Chain") -> None:
         """Generate the transition matrix with the uniform probability
@@ -52,37 +49,57 @@ class Markov_Chain:
         Args:
             self (Markov_Chain): mandatory self object.
         """
-        size = len(self.web_net)
-        uniform_probability = 1 / size
-        self.rank = np.array([uniform_probability for _ in range(size)], dtype=float)
+        self.N = len(self.web_net)
+        uniform_probability = 1 / self.N
+        self.rank = np.array([uniform_probability for _ in range(self.N)], dtype=float)
 
-    def simulate(
-        self: "Markov_Chain",
-        threshold: float = 0.001,
-        max: int = 100,
-        **kwargs,
-    ) -> None:
+    def simulate(self: "Markov_Chain") -> None:
         """starts the simulation by performing repetative matrix product following the
         relation rank_vector_{n+1} = rank_vector_{n}*Transition_probablity_matrix
 
         Args:
             self (Markov_Chain): mandatory self object.
-            threshold (float, optional): minimum threshold to error. Defaults to 0.001.
-            max (int, optional): maximum number of itterations. Defaults to 100.
         """
-        self.transition_matrix()
         self.rank_vector()
-        if kwargs["show_change"]:
-            print("Ranking at the start of simulation:", self.rank)
+        self.transition_matrix()
         dist = 1
-        while dist > threshold and max:
+        _max = self.max
+        if self.random_restart:
+            P = (1 - self.alpha) * self.P + (self.alpha / self.N) * np.ones(
+                shape=(self.N, self.N), dtype=float
+            )
+        else:
+            P = self.P
+
+        if self.show_change:
+            print("Ranking at the start of simulation:", self.rank)
+
+        while dist > self.threshold and _max:
             old = self.rank
-            self.rank = np.matmul(self.rank, self.P)
+            self.rank = np.matmul(self.rank, P)
             dist = np.linalg.norm(old - self.rank)
-            max -= 1
-        if kwargs["show_change"]:
+            _max -= 1
+        if self.show_change:
             print("Ranking at the end of simulation:", self.rank)
             print("It took", max, "steps to complete.")
+
+    def top(self: "Markov_Chain", n: int = 5) -> Optional[int]:
+        """Returns top n pages ranked by the algorithm.
+
+        Args:
+            self (Markov_Chain): mandatory self object.
+            n (int, optional): number of top results to show. Defaults to 5.
+
+        Returns:
+            Optional[int]: list of ranked pages from top rank at 0 to low rank towards right.
+        """
+
+        self.simulate()
+        if n > self.N:
+            n = self.N
+        self.rank_pages = [i for i in enumerate(self.rank)]
+        self.rank_pages = sorted(self.rank_pages, key=lambda k: k[1], reverse=True)
+        return [i[0] for i in self.rank_pages[:n]]
 
     def add_state(self: "Markov_Chain", _from: int, _to: int) -> None:
         """add state to the graph state
@@ -112,9 +129,10 @@ web_network = {
     1: set([2]),
     2: set([0, 1, 3]),
     3: set([0, 4]),
-    4: set([0, 1]),
+    4: set([0]),
 }
-
 www = Markov_Chain(web_network)
-
-www.simulate(show_change=True)
+www += (4, 1)
+n = 5
+pg = www.top(n)
+print(pg)
