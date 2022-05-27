@@ -1,4 +1,4 @@
-# The-PageRank-Citation-Ranking-Bringing-Order-to-the-Web
+# The PageRank Citation Ranking: Bringing Order to the Web
 
 ## Description
 
@@ -38,6 +38,10 @@ We can add new edge by using `+=` operator. For example we need to add an edge f
 www += (4, 1)
 ```
 
+### Note
+
+All web pages must have an outgoing url.
+
 To get the top `n` pages of the from `web_network` run,
 
 ```
@@ -52,3 +56,7 @@ Output will be,
 meesumaliqazalbash@MAQsPC:python3 The-PageRank-Citation-Ranking-Bringing-Order-to-the-Web/ranking.py
 [2, 0, 3, 1, 4]
 ```
+
+Rank saturation can be seen in the graph below for the above web network.
+
+![Markov Chain Algorithim for above web network](graph.png)
