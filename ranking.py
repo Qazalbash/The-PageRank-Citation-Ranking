@@ -1,4 +1,3 @@
-from os import stat
 from typing import Optional
 
 import numpy as np
