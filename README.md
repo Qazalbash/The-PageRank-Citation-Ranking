@@ -10,6 +10,7 @@ Requirments are python3 and,
 
 ```console
 pip install numpy
+pip install matplotlib
 ```
 
 ## How to run?
