@@ -6,7 +6,7 @@ The importance of a Web page is an inherently subjective matter, which depends o
 
 ## Requirment
 
-Requirments are python3 and,
+Requirments are `python3.6` or above, and
 
 ```console
 pip install numpy

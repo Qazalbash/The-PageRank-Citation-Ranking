@@ -11,7 +11,7 @@ class Markov_Chain:
         self: "Markov_Chain",
         web_net: dict = None,
         max: int = 100,
-        threshold: float = 0.001,
+        error: float = 0.001,
         alpha: float = 0.001,
         random_restart: bool = True,
         show_change: bool = False,
@@ -33,7 +33,7 @@ class Markov_Chain:
             self.web_net = {}
 
         self.max = max
-        self.threshold = threshold
+        self.error = error
         self.alpha = alpha
         self.random_restart = random_restart
         self.show_change = show_change
@@ -86,10 +86,7 @@ class Markov_Chain:
         else:
             P = self.P
 
-        if self.show_change:
-            print("Ranking at the start of simulation:", self.rank)
-
-        while dist > self.threshold and _max:
+        while dist > self.error and _max:
             self.change.append(self.rank)
             old = self.rank
             self.rank = np.matmul(self.rank, P)
@@ -97,8 +94,7 @@ class Markov_Chain:
             _max -= 1
         self.max -= _max
         if self.show_change:
-            print("Ranking at the end of simulation:", self.rank)
-            print("It took", self.max, "steps to complete.")
+            self.graph()
 
     def top(self: "Markov_Chain", n: int = 5) -> Optional[int]:
         """Returns top n pages ranked by the algorithm.
@@ -119,9 +115,15 @@ class Markov_Chain:
         return [i[0] for i in self.rank_pages[:n]]
 
     def graph(self: "Markov_Chain") -> None:
+        """Generate a line graph to show how the ranks changed.
+
+        Args:
+            self (Markov_Chain): mandatory self object.
+        """
         self.change = np.transpose(self.change)
         for i in range(self.N):
             plt.plot(list(range(self.max)), self.change[i], label=str(i))
+        plt.xticks(list(range(self.max)))
         plt.xlabel("Number of steps")
         plt.ylabel("Rank at each step")
         plt.title("Markov Chain Algorithm")
@@ -158,13 +160,10 @@ web_network = {
     3: set([0, 4]),
     4: set([0]),
 }
-www = Markov_Chain(web_network, random_restart=False, show_change=False, threshold=0)
+
+www = Markov_Chain(web_network, random_restart=False, show_change=True, error=0.00001)
+
 www += (4, 1)
-# www += (5, 2)
-# www += (0, 5)
-# www += (6, 1)
-# www += (2, 6)
-# www += (1, 6)
+
 n = 5
 pg = www.top(n)
-www.graph()
