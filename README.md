@@ -1,5 +1,8 @@
 # The PageRank Citation Ranking: Bringing Order to the Web
 
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/MeesumAliQazalbash/The-PageRank-Citation-Ranking.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MeesumAliQazalbash/The-PageRank-Citation-Ranking/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/MeesumAliQazalbash/The-PageRank-Citation-Ranking.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MeesumAliQazalbash/The-PageRank-Citation-Ranking/context:python)
+
 ## Description
 
 The importance of a Web page is an inherently subjective matter, which depends on the readers interests, knowledge and attitudes. But there is still much that can be said objectively about the relative importance of Web pages. Link the [orginal paper](http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf) and a [video explaination](https://www.youtube.com/watch?v=JGQe4kiPnrU).
